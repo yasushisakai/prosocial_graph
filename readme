@@ -1,0 +1,6 @@
+
+- how to run
+pnpm install
+pnpm run dev
+
+there should be no issue using normal npm, but this is not tested.
