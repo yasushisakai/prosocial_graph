@@ -2,10 +2,10 @@
   "name": "prosocial_graph",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "source": "src/index.html",
   "scripts": {
-    "dev": "parcel --port 7458"
+    "dev": "parcel --port 7458",
+    "build": "parcel build --public-url ./"
   },
   "keywords": [],
   "author": "",

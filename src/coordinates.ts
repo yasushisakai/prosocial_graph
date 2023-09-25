@@ -18,7 +18,7 @@ export const normalizedToCoordinates = (nx: number, ny: number): Point => {
 };
 
 // markus's idea
-const OFFICE_2024 = 27000000;
+const OFFICE_2024 = 28000000;
 
 export const officeToCoordinate = (year: number, office: number): Point => {
   const nx = normalizeYear(year);

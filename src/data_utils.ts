@@ -45,7 +45,7 @@ export const preProcess = (data: GeoJsonData): ReduceData => {
   const amenities = [
     "Utility",
     "Retail",
-    "Government Operations",
+    // "Government Operations",
     "Industrial",
     "Charitable / Religious",
   ];

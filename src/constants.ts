@@ -7,8 +7,8 @@ export const START_YEAR = 1980;
 export const THIS_YEAR = 2023;
 export const END_YEAR = 2040;
 export const RESIDENCE_TARGET_RATIO = 1.676009385;
-// export const AMENITIES_TARGET_RATIO = 0.18315354;
-export const AMENITIES_TARGET_RATIO = 1.0;
+export const AMENITIES_TARGET_RATIO = 0.18315354;
+// export const AMENITIES_TARGET_RATIO = 1.0;
 
 export const AMENITY_GOAL = 4387588;
 export const RESIDENTIAL_GOAL = 40150128;
