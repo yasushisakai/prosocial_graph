@@ -2,9 +2,9 @@ import { END_YEAR, HEIGHT, MARGIN_PIXEL, START_YEAR, WIDTH } from "./constants";
 import { Point } from "./models";
 
 export const normalizeXAxis = (index: number) => {
-    let t = index / (END_YEAR - START_YEAR);
-    return t;
-}
+  let t = index / (END_YEAR - START_YEAR - 1);
+  return t;
+};
 
 // converts parameter x,y values to actual (screen) coordinates
 export const normalizedToCoordinates = (nx: number, ny: number): Point => {
@@ -16,6 +16,6 @@ export const normalizedToCoordinates = (nx: number, ny: number): Point => {
 };
 
 export const toScreenCoordinates = (year_index: number, ny: number): Point => {
-    const nx = normalizeXAxis(year_index);
-    return normalizedToCoordinates(nx, ny);
-}
+  const nx = normalizeXAxis(year_index);
+  return normalizedToCoordinates(nx, ny);
+};

@@ -3,8 +3,9 @@ import { fetch_numbers, preProcess } from "./data_utils";
 import {
   createCurves,
   drawCommunityMeeting,
-  drawCurveSpanX,
+  drawCurve,
   drawHorizontalLine,
+  drawLabel,
   drawYears,
 } from "./geometry";
 import { Curves } from "./models";
@@ -22,6 +23,8 @@ const sketch = (p: p5) => {
 
   p.setup = () => {
     p.createCanvas(1920, 500);
+    p.textSize(14);
+    p.strokeCap(p.SQUARE);
   };
 
   p.draw = () => {
@@ -31,61 +34,34 @@ const sketch = (p: p5) => {
     }
 
     p.background("#000000");
+    drawLabel(p, 0.0625, 0.93, "URBAN EQUILIBRIUM");
     drawHorizontalLine(p, 0.9);
     p.stroke("#ffffff");
     p.noFill();
+
     let t = ((p.frameCount - loadTimeOffset) % 3600) / 3600.0;
-    drawAxis(p);
     drawYears(p, t);
 
-    p.push();
-    p.stroke("#DB19F4");
-    // office line
-    drawCurveSpanX(p, curves.office, t, "office");
-    p.pop();
-    p.push();
-    p.stroke("#FE0D00");
-    // amenities line
-    drawCurveSpanX(p, curves.amenities, t, "amenities");
-    p.pop();
+    drawCurve(p, curves.office, t, "OFFICE / R&D", "#E82BFF", 3.0, true);
+    drawCurve(p, curves.amenities, t, "AMENITIES & SERVICES", "#FE0D00");
 
-    drawResidential(p, curves, t);
+    drawCurve(p, curves.residential.early, t, "EARLY CAREER HOUSING", "#FFF409");
+    drawCurve(p, curves.residential.mid, t, "MID CAREER HOUSING", "#F6E44B");
+    drawCurve(p, curves.residential.essential, t, "ESSENTIAL HOUSING", "#FAD401");
+    drawCurve(p, curves.residential.executive, t, "EXECUTIVE HOUSING", "#FFD752");
+    drawCurve(p, curves.residential.senior, t, "SENIOR HOUSING", "#FFC40C");
 
     [2025, 2028, 2031, 2034, 2037, 2040].forEach((year) => {
       drawCommunityMeeting(p, year, t);
     });
+
+    drawAxis(p);
   };
-};
-
-const drawResidential = (p: p5, curves: Curves, t: number) => {
-  p.push();
-  p.stroke("#E8DE3A");
-  drawCurveSpanX(p, curves.residential.early, t, "early career");
-  p.pop();
-
-  p.push();
-  p.stroke("#FFE14D");
-  drawCurveSpanX(p, curves.residential.mid, t);
-  p.pop();
-
-  p.push();
-  p.stroke("#F5C138");
-  drawCurveSpanX(p, curves.residential.essential, t);
-  p.pop();
-
-  p.push();
-  p.stroke("#FFB33A");
-  drawCurveSpanX(p, curves.residential.executive, t, "executive");
-  p.pop();
-
-  p.push();
-  p.stroke("#FFB33A");
-  drawCurveSpanX(p, curves.residential.senior, t);
-  p.pop();
 };
 
 const drawAxis = (p: p5) => {
   p.push();
+  p.strokeCap(p.PROJECT);
   p.strokeWeight(3);
   let y = p.height - 50;
   let x = 50;

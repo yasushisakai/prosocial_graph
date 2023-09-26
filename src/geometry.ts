@@ -5,12 +5,7 @@ import {
   normalizedToCoordinates,
   toScreenCoordinates,
 } from "./coordinates";
-import {
-  AMENITIES_TARGET_RATIO,
-  END_YEAR,
-  START_YEAR,
-  THIS_YEAR,
-} from "./constants";
+import { END_YEAR, START_YEAR, THIS_YEAR } from "./constants";
 
 export const curveLength = (points: Point[]): number => {
   let length = 0.0;
@@ -64,10 +59,7 @@ export const createCurves = (annual: ReduceData): Curves => {
   };
 };
 
-export const createCurve = (
-  points: Point[],
-  noise: boolean = false,
-): Curve => {
+export const createCurve = (points: Point[], noise: boolean = false): Curve => {
   if (noise) {
     points = points.map((p) => {
       let y = (Math.random() - 0.5) * 5 + p.y;
@@ -84,46 +76,25 @@ export const createCurve = (
   return { points, length, bbox };
 };
 
-export const drawCurve = (p: p5, curve: Curve, t: number) => {
-  const targetLength = t * curve.length;
-  let currentLength = 0;
-
-  p.beginShape();
-  p.vertex(curve.points[0].x, curve.points[0].y);
-  for (let i = 1; i < curve.points.length; i++) {
-    let segLength = Math.sqrt(
-      Math.pow(curve.points[i].x - curve.points[i - 1].x, 2) +
-        Math.pow(curve.points[i].y - curve.points[i - 1].y, 2),
-    );
-
-    if (currentLength + segLength >= targetLength) {
-      const q = (targetLength - currentLength) / segLength;
-      const tx =
-        curve.points[i - 1].x + q * (curve.points[i].x - curve.points[i - 1].x);
-      const ty =
-        curve.points[i - 1].y + q * (curve.points[i].y - curve.points[i - 1].y);
-      p.vertex(tx, ty);
-      break;
-    } else {
-      const { x, y } = curve.points[i];
-      currentLength += segLength;
-      p.vertex(x, y);
-    }
-  }
-  p.endShape();
-};
-
-export const drawCurveSpanX = (
+export const drawCurve = (
   p: p5,
   curve: Curve,
   t: number,
   label: string = "",
+  color: string = "#FFFFFF",
+  strokeWeight: number = 1.0,
+  bold: boolean = false,
 ) => {
   const targetX = t * (curve.bbox.ep.x - curve.bbox.sp.x);
   let currentX = 0;
   let endPoint: Point;
 
+  p.push();
+  p.stroke(color);
+
+  p.push();
   p.beginShape();
+  p.strokeWeight(strokeWeight);
   p.vertex(curve.points[0].x, curve.points[0].y);
   for (let i = 1; i < curve.points.length; i++) {
     let deltaX = curve.points[i].x - curve.points[i - 1].x;
@@ -144,10 +115,16 @@ export const drawCurveSpanX = (
     }
   }
   p.endShape();
+  p.pop();
 
   p.push();
-  p.textAlign(p.LEFT, p.CENTER);
-  p.text(label, endPoint.x + 5, endPoint.y);
+  p.noStroke();
+  p.fill(color);
+  p.textAlign(p.LEFT, p.BOTTOM);
+  if (bold) p.textStyle(p.BOLD);
+  p.text(label, endPoint.x + 5, endPoint.y + 3);
+  p.pop();
+
   p.pop();
 };
 
@@ -156,20 +133,22 @@ export const drawVerticaLine = (
   nx: number,
   label: string = "",
   labelOpacity: number = 255,
+  spt: number = 0.0,
 ) => {
-  let sp = normalizedToCoordinates(nx, 0.0);
+  let sp = normalizedToCoordinates(nx, spt);
   let ep = normalizedToCoordinates(nx, 1.0);
   p.line(sp.x, sp.y, ep.x, ep.y);
   p.push();
   p.noStroke();
   p.fill(255, labelOpacity);
-  p.textAlign(p.CENTER);
+  p.textAlign(p.LEFT);
   p.text(label, sp.x, sp.y + 20);
   p.pop();
 };
 
 export const drawYears = (p: p5, t: number) => {
-  for (let i = 0; i < END_YEAR - START_YEAR; i++) {
+    const length = END_YEAR - START_YEAR;
+  for (let i = 0; i < length; i++) {
     let nStart = normalizeXAxis(i - 7);
     let nYear = normalizeXAxis(i);
     let nt = t - nStart;
@@ -182,15 +161,17 @@ export const drawYears = (p: p5, t: number) => {
     if (i === THIS_YEAR - START_YEAR) {
       p.stroke(255, 255);
       p.strokeWeight(3);
-      drawVerticaLine(p, nYear, `${THIS_YEAR}`);
+      drawVerticaLine(p, nYear, `${THIS_YEAR}`, 255, -0);
     } else {
       p.strokeWeight(1);
       p.stroke(255, 100 * ar);
       let label = "";
-      if (i % 5 === 3) {
+      if (i % 5 === 3 || i === 0 || i === length - 1) {
         label = `${i + START_YEAR}`;
+        drawVerticaLine(p, nYear, label, 255 * ar, -0.02);
+      } else {
+        drawVerticaLine(p, nYear, label, 255 * ar);
       }
-      drawVerticaLine(p, nYear, label, 255 * ar);
     }
     p.pop();
   }
@@ -208,9 +189,18 @@ export const drawCommunityMeeting = (p: p5, year: number, t: number) => {
 
   p.push();
   p.strokeWeight(10);
-  p.strokeCap(p.SQUARE);
   p.stroke(255, 255, 0, 100 * ar);
   drawVerticaLine(p, nYear);
+  p.pop();
+};
+
+export const drawLabel = (p: p5, nx: number, ny: number, text: string) => {
+  const pt = normalizedToCoordinates(nx, ny);
+  p.push();
+  p.textAlign(p.CENTER, p.CENTER);
+  p.fill("white");
+  p.noStroke();
+  p.text(text, pt.x, pt.y);
   p.pop();
 };
 
