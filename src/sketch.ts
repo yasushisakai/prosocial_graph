@@ -31,7 +31,7 @@ const sketch = (p: p5) => {
     }
 
     p.background("#000000");
-    drawHorizontalLine(p, 0.8);
+    drawHorizontalLine(p, 0.9);
     p.stroke("#ffffff");
     p.noFill();
     let t = ((p.frameCount - loadTimeOffset) % 3600) / 3600.0;
