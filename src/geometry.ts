@@ -1,37 +1,16 @@
 import p5 from "p5";
-import { Curves, ReduceData } from "./models";
+import { Curve, Curves, Point, ReduceData } from "./models";
 import {
-  normalizeYear,
+  normalizeXAxis,
   normalizedToCoordinates,
-  officeRelativeToCoordinate,
-  officeToCoordinate,
-  residentialToCoordinates,
+  toScreenCoordinates,
 } from "./coordinates";
 import {
   AMENITIES_TARGET_RATIO,
-  EARLY_YEAR_SHARE,
   END_YEAR,
-  RESIDENCE_TARGET_RATIO,
   START_YEAR,
   THIS_YEAR,
 } from "./constants";
-import { divdeResidential, jitter } from "./data_utils";
-
-export interface Point {
-  x: number;
-  y: number;
-}
-
-export interface BoundingBox {
-  sp: Point;
-  ep: Point;
-}
-
-export interface Curve {
-  points: Point[];
-  length: number;
-  bbox: BoundingBox;
-}
 
 export const curveLength = (points: Point[]): number => {
   let length = 0.0;
@@ -62,56 +41,46 @@ export const curveBbox = (points: Point[]) => {
 };
 
 export const createCurves = (annual: ReduceData): Curves => {
-  let officePoints: Point[] = [];
-  // let residentialPoints: Point[] = [];
-  let earlyPoints: Point[] = [];
-  let midPoints: Point[] = [];
-  let essentialPoints: Point[] = [];
-  let executivePoints: Point[] = [];
-  let seniorPoints: Point[] = [];
+  const convert = (rate: number, i: number) => toScreenCoordinates(i, rate);
 
-  let amenitiesPoints: Point[] = [];
-  for (let key of Object.keys(annual)) {
-    const year = parseInt(key);
-    const office = annual[year]["office"];
-    const residential = annual[year]["residential"];
-    const amenities = annual[year]["amenities"];
-    officePoints.push(officeToCoordinate(year, office));
-    const { ep, mp, esp, exp, sp } = residentialToCoordinates(
-      year,
-      residential,
-      office,
-    );
-    earlyPoints.push(ep);
-    midPoints.push(mp);
-    essentialPoints.push(esp);
-    executivePoints.push(exp);
-    seniorPoints.push(sp);
-    const amePoint = officeRelativeToCoordinate(
-      year,
-      amenities,
-      office,
-      AMENITIES_TARGET_RATIO,
-    );
-    amenitiesPoints.push(amePoint);
-  }
+  const officePoints = annual.office.map(convert);
+  const earlyPoints = annual.residential.early.map(convert);
+  const midPoints = annual.residential.mid.map(convert);
+  const executivePoints = annual.residential.executive.map(convert);
+  const essentialPoints = annual.residential.essential.map(convert);
+  const seniorPoints = annual.residential.senior.map(convert);
+  const amenitiesPoints = annual.amenities.map(convert);
 
   return {
     office: createCurve(officePoints),
     residential: {
-      early: createCurve(earlyPoints),
-      mid: createCurve(midPoints),
-      essential: createCurve(essentialPoints),
-      executive: createCurve(executivePoints),
-      senior: createCurve(seniorPoints),
+      early: createCurve(earlyPoints, true),
+      mid: createCurve(midPoints, true),
+      essential: createCurve(essentialPoints, true),
+      executive: createCurve(executivePoints, true),
+      senior: createCurve(seniorPoints, true),
     },
-    amenities: createCurve(amenitiesPoints),
+    amenities: createCurve(amenitiesPoints, true),
   };
 };
 
-export const createCurve = (points: Point[]): Curve => {
-  let length = curveLength(points);
-  let bbox = curveBbox(points);
+export const createCurve = (
+  points: Point[],
+  noise: boolean = false,
+): Curve => {
+  if (noise) {
+    points = points.map((p) => {
+      let y = (Math.random() - 0.5) * 5 + p.y;
+      y = Math.max(0, y);
+      return {
+        x: p.x,
+        y,
+      };
+    });
+  }
+
+  const length = curveLength(points);
+  const bbox = curveBbox(points);
   return { points, length, bbox };
 };
 
@@ -184,13 +153,12 @@ export const drawCurveSpanX = (
 
 export const drawVerticaLine = (
   p: p5,
-  year: number,
+  nx: number,
   label: string = "",
   labelOpacity: number = 255,
 ) => {
-  let n = normalizeYear(year);
-  let sp = normalizedToCoordinates(n, 0.0);
-  let ep = normalizedToCoordinates(n, 1.0);
+  let sp = normalizedToCoordinates(nx, 0.0);
+  let ep = normalizedToCoordinates(nx, 1.0);
   p.line(sp.x, sp.y, ep.x, ep.y);
   p.push();
   p.noStroke();
@@ -201,9 +169,9 @@ export const drawVerticaLine = (
 };
 
 export const drawYears = (p: p5, t: number) => {
-  for (let year = START_YEAR; year < END_YEAR; year++) {
-    let nStart = normalizeYear(year - 7);
-    let nYear = normalizeYear(year);
+  for (let i = 0; i < END_YEAR - START_YEAR; i++) {
+    let nStart = normalizeXAxis(i - 7);
+    let nYear = normalizeXAxis(i);
     let nt = t - nStart;
     let ny = nYear - nStart;
     let ar = nt / ny;
@@ -211,26 +179,27 @@ export const drawYears = (p: p5, t: number) => {
     ar = ar > 0.0 ? ar : 0.0;
 
     p.push();
-    if (year === THIS_YEAR) {
+    if (i === THIS_YEAR - START_YEAR) {
       p.stroke(255, 255);
       p.strokeWeight(3);
-      drawVerticaLine(p, year, `${THIS_YEAR}`);
+      drawVerticaLine(p, nYear, `${THIS_YEAR}`);
     } else {
       p.strokeWeight(1);
       p.stroke(255, 100 * ar);
       let label = "";
-      if (year % 5 === 3) {
-        label = `${year}`;
+      if (i % 5 === 3) {
+        label = `${i + START_YEAR}`;
       }
-      drawVerticaLine(p, year, label, 255 * ar);
+      drawVerticaLine(p, nYear, label, 255 * ar);
     }
     p.pop();
   }
 };
 
 export const drawCommunityMeeting = (p: p5, year: number, t: number) => {
-  let nStart = normalizeYear(year - 1);
-  let nYear = normalizeYear(year);
+  let yearIndex = year - START_YEAR;
+  let nStart = normalizeXAxis(yearIndex - 1);
+  let nYear = normalizeXAxis(yearIndex);
   let nt = t - nStart;
   let ny = nYear - nStart;
   let ar = nt / ny;
@@ -239,8 +208,9 @@ export const drawCommunityMeeting = (p: p5, year: number, t: number) => {
 
   p.push();
   p.strokeWeight(10);
+  p.strokeCap(p.SQUARE);
   p.stroke(255, 255, 0, 100 * ar);
-  drawVerticaLine(p, year);
+  drawVerticaLine(p, nYear);
   p.pop();
 };
 
