@@ -10,6 +10,7 @@ import {
 import { Curves } from "./models";
 
 let curves: Curves;
+let loadTimeOffset = 0;
 
 const sketch = (p: p5) => {
   p.preload = async () => {
@@ -24,11 +25,16 @@ const sketch = (p: p5) => {
   };
 
   p.draw = () => {
+    if (!curves) {
+      loadTimeOffset = p.frameCount;
+      return;
+    }
+
     p.background("#000000");
     drawHorizontalLine(p, 0.8);
     p.stroke("#ffffff");
     p.noFill();
-    let t = (p.frameCount % 3600) / 3600.0;
+    let t = ((p.frameCount - loadTimeOffset) % 3600) / 3600.0;
     drawAxis(p);
     drawYears(p, t);
 
@@ -48,7 +54,6 @@ const sketch = (p: p5) => {
     [2025, 2028, 2031, 2034, 2037, 2040].forEach((year) => {
       drawCommunityMeeting(p, year, t);
     });
-
   };
 };
 
