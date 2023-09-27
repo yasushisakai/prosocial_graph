@@ -5,7 +5,14 @@ import {
   normalizedToCoordinates,
   toScreenCoordinates,
 } from "./coordinates";
-import { END_YEAR, START_YEAR, THIS_YEAR } from "./constants";
+import {
+  END_YEAR,
+  MARGIN_PIXEL,
+  START_YEAR,
+  TEXT_SIZE,
+  THIS_YEAR,
+  WIDTH,
+} from "./constants";
 
 export const curveLength = (points: Point[]): number => {
   let length = 0.0;
@@ -80,11 +87,9 @@ export const drawCurve = (
   p: p5,
   curve: Curve,
   t: number,
-  label: string = "",
   color: string = "#FFFFFF",
   strokeWeight: number = 1.0,
-  bold: boolean = false,
-) => {
+): Point => {
   const targetX = t * (curve.bbox.ep.x - curve.bbox.sp.x);
   let currentX = 0;
   let endPoint: Point;
@@ -116,15 +121,52 @@ export const drawCurve = (
   }
   p.endShape();
   p.pop();
-
   p.push();
   p.noStroke();
   p.fill(color);
   p.textAlign(p.LEFT, p.BOTTOM);
-  if (bold) p.textStyle(p.BOLD);
-  p.text(label, endPoint.x + 5, endPoint.y + 3);
+  p.pop();
   p.pop();
 
+  return endPoint;
+};
+
+export const drawCurveLabels = (
+  p: p5,
+  x: number,
+  curveLabels: [number, string, string][],
+) => {
+  //sort the labels
+  const sorted = curveLabels.sort((a, b) => b[0] - a[0]);
+  const first = sorted[0];
+  drawCurveLabel(p, x, first[0], first[1], first[2]);
+  let lastY = first[0];
+
+  for (let i = 1; i < sorted.length; i++) {
+    const [y, text, color] = sorted[i];
+    if (lastY - y < TEXT_SIZE) {
+      const newY = lastY - (TEXT_SIZE + 1);
+      drawCurveLabel(p, x, newY, text, color);
+      lastY = newY;
+    } else {
+      drawCurveLabel(p, x, y, text, color);
+      lastY = y;
+    }
+  }
+};
+
+const drawCurveLabel = (
+  p: p5,
+  x: number,
+  y: number,
+  text: string,
+  color: string,
+) => {
+  p.push();
+  p.noStroke();
+  p.fill(color);
+  p.textAlign(p.LEFT, p.BOTTOM);
+  p.text(text, x, y);
   p.pop();
 };
 
@@ -147,7 +189,7 @@ export const drawVerticaLine = (
 };
 
 export const drawYears = (p: p5, t: number) => {
-    const length = END_YEAR - START_YEAR;
+  const length = END_YEAR - START_YEAR;
   for (let i = 0; i < length; i++) {
     let nStart = normalizeXAxis(i - 7);
     let nYear = normalizeXAxis(i);
@@ -194,18 +236,24 @@ export const drawCommunityMeeting = (p: p5, year: number, t: number) => {
   p.pop();
 };
 
-export const drawLabel = (p: p5, nx: number, ny: number, text: string) => {
-  const pt = normalizedToCoordinates(nx, ny);
-  p.push();
-  p.textAlign(p.CENTER, p.CENTER);
-  p.fill("white");
-  p.noStroke();
-  p.text(text, pt.x, pt.y);
-  p.pop();
+export const drawLabel = (
+  p: p5,
+  nx: number,
+  ny: number,
+  text: string,
+  appearAt: number = 0,
+) => {
+  if (ny < appearAt) {
+    // const pt = normalizedToCoordinates(nx, ny);
+    p.push();
+    p.textAlign(p.CENTER, p.CENTER);
+    p.fill("white");
+    p.noStroke();
+    p.text(text, nx, ny);
+    p.pop();
+  }
 };
 
-export const drawHorizontalLine = (p: p5, rate: number) => {
-  const sp = normalizedToCoordinates(0.0, rate);
-  const ep = normalizedToCoordinates(1.0, rate);
-  p.line(sp.x, sp.y, ep.x, ep.y);
+export const drawHorizontalLine = (p: p5, y: number) => {
+  p.line(MARGIN_PIXEL, y, WIDTH - MARGIN_PIXEL, y);
 };

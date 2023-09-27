@@ -1,6 +1,7 @@
 export const WIDTH = 1920;
 export const HEIGHT = 500;
 export const MARGIN_PIXEL = 50;
+export const TEXT_SIZE = 14;
 
 export const START_YEAR = 1980;
 export const THIS_YEAR = 2023;
@@ -17,3 +18,11 @@ export const GOOGLE_SHEETS_API_KEY = "AIzaSyBDNnjO9QRHXT2EZNujpENrHtE8wMcE20k";
 export const SHEET_ID = "1WFUnX9XOeb8s6VUH_Zv6Cr71lgnjkmxqKDTSkkOMk6E";
 export const SHEET_NAME = "area_and_ratio";
 export const RANGE = "B2:BJ10";
+
+export const OFFICE_COLOR = "#E82BFF";
+export const AMENITIES_COLOR = "#FE0D00";
+export const EARLY_COLOR = "#FFF409";
+export const MID_COLOR = "#F6E44B";
+export const ESSENTIAL_COLOR = "#FAD401";
+export const EXECUTIVE_COLOR = "#FFD752";
+export const SENIOR_COLOR = "#FFC40C"; 
