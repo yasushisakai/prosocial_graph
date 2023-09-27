@@ -15,10 +15,13 @@ import {
   EARLY_COLOR,
   ESSENTIAL_COLOR,
   EXECUTIVE_COLOR,
+  LEFT_MARGIN,
   MID_COLOR,
   OFFICE_COLOR,
+  RIGHT_MARGIN,
   SENIOR_COLOR,
   TEXT_SIZE,
+  VERTICAL_MARGIN,
 } from "./constants";
 
 let curves: Curves;
@@ -92,10 +95,9 @@ const drawAxis = (p: p5) => {
   p.push();
   p.strokeCap(p.PROJECT);
   p.strokeWeight(3);
-  let y = p.height - 50;
-  let x = 50;
-  p.line(50, y, p.width - 50, y);
-  p.line(x, 50, x, p.height - 50);
+  let y = p.height - VERTICAL_MARGIN;
+  p.line(LEFT_MARGIN, y, p.width - RIGHT_MARGIN, y);
+  p.line(LEFT_MARGIN, VERTICAL_MARGIN, LEFT_MARGIN, p.height - VERTICAL_MARGIN);
   p.pop();
 };
 

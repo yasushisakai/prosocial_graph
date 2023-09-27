@@ -7,7 +7,8 @@ import {
 } from "./coordinates";
 import {
   END_YEAR,
-  MARGIN_PIXEL,
+  LEFT_MARGIN,
+  RIGHT_MARGIN,
   START_YEAR,
   TEXT_SIZE,
   THIS_YEAR,
@@ -97,12 +98,12 @@ export const drawCurve = (
   p.push();
   p.stroke(color);
 
-  p.push();
   p.beginShape();
   p.strokeWeight(strokeWeight);
   p.vertex(curve.points[0].x, curve.points[0].y);
   for (let i = 1; i < curve.points.length; i++) {
     let deltaX = curve.points[i].x - curve.points[i - 1].x;
+    endPoint = curve.points[i];
 
     if (currentX + deltaX >= targetX) {
       const q = (targetX - currentX) / deltaX;
@@ -120,12 +121,6 @@ export const drawCurve = (
     }
   }
   p.endShape();
-  p.pop();
-  p.push();
-  p.noStroke();
-  p.fill(color);
-  p.textAlign(p.LEFT, p.BOTTOM);
-  p.pop();
   p.pop();
 
   return endPoint;
@@ -145,7 +140,7 @@ export const drawCurveLabels = (
   for (let i = 1; i < sorted.length; i++) {
     const [y, text, color] = sorted[i];
     if (lastY - y < TEXT_SIZE) {
-      const newY = lastY - (TEXT_SIZE + 1);
+      const newY = lastY - TEXT_SIZE;
       drawCurveLabel(p, x, newY, text, color);
       lastY = newY;
     } else {
@@ -166,7 +161,7 @@ const drawCurveLabel = (
   p.noStroke();
   p.fill(color);
   p.textAlign(p.LEFT, p.BOTTOM);
-  p.text(text, x, y);
+  p.text(text, x + 5, y + 2);
   p.pop();
 };
 
@@ -255,5 +250,5 @@ export const drawLabel = (
 };
 
 export const drawHorizontalLine = (p: p5, y: number) => {
-  p.line(MARGIN_PIXEL, y, WIDTH - MARGIN_PIXEL, y);
+  p.line(LEFT_MARGIN, y, WIDTH - RIGHT_MARGIN, y);
 };

@@ -1,6 +1,8 @@
 export const WIDTH = 1920;
 export const HEIGHT = 500;
-export const MARGIN_PIXEL = 50;
+export const VERTICAL_MARGIN = 50;
+export const LEFT_MARGIN = 50;
+export const RIGHT_MARGIN = 180;
 export const TEXT_SIZE = 14;
 
 export const START_YEAR = 1980;
