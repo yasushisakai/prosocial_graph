@@ -21,10 +21,15 @@ export const SHEET_ID = "1WFUnX9XOeb8s6VUH_Zv6Cr71lgnjkmxqKDTSkkOMk6E";
 export const SHEET_NAME = "area_and_ratio";
 export const RANGE = "B2:BJ10";
 
-export const OFFICE_COLOR = "#E82BFF";
-export const AMENITIES_COLOR = "#FE0D00";
+export const OFFICE_COLOR = "#CA3A3A";
+export const AMENITIES_COLOR = "#3455E5";
 export const EARLY_COLOR = "#FFF409";
 export const MID_COLOR = "#F6E44B";
 export const ESSENTIAL_COLOR = "#FAD401";
 export const EXECUTIVE_COLOR = "#FFD752";
 export const SENIOR_COLOR = "#FFC40C"; 
+
+// not using this, but for the record
+// yellow/residential - #C2B924
+// green - #425C36
+// river - #525E68 

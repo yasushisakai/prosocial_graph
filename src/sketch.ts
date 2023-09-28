@@ -48,7 +48,6 @@ const sketch = (p: p5) => {
     }
 
     p.background("#000000");
-    drawHorizontalLine(p, 0.9);
     p.stroke("#ffffff");
     p.noFill();
 
@@ -57,13 +56,13 @@ const sketch = (p: p5) => {
 
     let curveLabels = [];
 
-    const oep = drawCurve(p, curves.office, t, OFFICE_COLOR, 4);
+    const oep = drawCurve(p, curves.office, t, OFFICE_COLOR, 5);
     curveLabels.push([oep.y, "OFFICE / R&D", OFFICE_COLOR]);
 
     drawLabel(p, 150, oep.y - 10, "URBAN EQUILIBRIUM", 320);
     drawHorizontalLine(p, oep.y);
 
-    const aep = drawCurve(p, curves.amenities, t, AMENITIES_COLOR);
+    const aep = drawCurve(p, curves.amenities, t, AMENITIES_COLOR, 3);
     curveLabels.push([aep.y, "AMENITIES & SERVICES", AMENITIES_COLOR]);
 
     const eaep = drawCurve(p, curves.residential.early, t, EARLY_COLOR);

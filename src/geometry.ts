@@ -160,6 +160,7 @@ const drawCurveLabel = (
   p.push();
   p.noStroke();
   p.fill(color);
+p.textStyle(p.BOLD);
   p.textAlign(p.LEFT, p.BOTTOM);
   p.text(text, x + 5, y + 2);
   p.pop();
@@ -242,6 +243,7 @@ export const drawLabel = (
     // const pt = normalizedToCoordinates(nx, ny);
     p.push();
     p.textAlign(p.CENTER, p.CENTER);
+    p.textStyle(p.BOLD);
     p.fill("white");
     p.noStroke();
     p.text(text, nx, ny);
